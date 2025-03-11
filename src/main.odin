@@ -1,6 +1,7 @@
 package main
 
 import "core:log"
+import "core:math"
 import sdl "vendor:sdl3"
 
 device: ^sdl.GPUDevice
@@ -72,6 +73,12 @@ update_loop :: proc() {
             }
         }
 
+        now := f32(sdl.GetTicks()) / 1000
+        red := 0.5 + 0.5 * math.sin(now)
+        green := 0.5 + 0.5 * math.sin(now + math.TAU / 3)
+        blue := 0.5 + 0.5 * math.sin(now + math.PI * 4 / 3)
+        clear_color := sdl.FColor{red, green, blue, 1}
+
         command_buffer := sdl.AcquireGPUCommandBuffer(device)
         if command_buffer == nil {
             log.errorf("unable to aquire command buffer: {}", sdl.GetError())
@@ -88,7 +95,7 @@ update_loop :: proc() {
         ) {
             color_target_info := sdl.GPUColorTargetInfo {
                 texture     = swapchain_texture,
-                clear_color = sdl.FColor{1, 0.5, 0.5, 1},
+                clear_color = clear_color,
                 load_op     = .CLEAR,
                 store_op    = .STORE,
             }
